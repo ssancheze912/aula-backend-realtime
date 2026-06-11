@@ -4,8 +4,13 @@ import { Server } from 'socket.io'
 import cors from 'cors'
 import helmet from 'helmet'
 import dotenv from 'dotenv'
+import { registerChatHandlers } from './handlers/chatHandlers'
+import { registerRtcHandlers } from './handlers/rtcHandlers'
 
 dotenv.config()
+
+// Inicializa Firebase Admin (persistencia de chat) si hay credenciales.
+import './config/firebase'
 
 const app = express()
 const httpServer = createServer(app)
@@ -28,6 +33,10 @@ app.get('/health', (_req, res) => {
 
 io.on('connection', (socket) => {
   console.log(`Socket conectado: ${socket.id}`)
+
+  registerChatHandlers(io, socket)
+  registerRtcHandlers(io, socket)
+
   socket.on('disconnect', () => {
     console.log(`Socket desconectado: ${socket.id}`)
   })

@@ -1,0 +1,23 @@
+# Blueprint de despliegue en Render para backend-realtime (Socket.io + WebRTC signaling).
+# Render inyecta PORT automáticamente; el código usa process.env.PORT.
+# Las variables marcadas con sync:false se configuran a mano en el dashboard de Render.
+services:
+  - type: web
+    name: backend-realtime
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: FRONTEND_URL
+        sync: false
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false
