@@ -9,6 +9,7 @@ import cors from 'cors'
 import helmet from 'helmet'
 import { registerChatHandlers } from './handlers/chatHandlers'
 import { registerRtcHandlers } from './handlers/rtcHandlers'
+import { getIceServers, isTurnConfigured } from './config/iceServers'
 
 // Inicializa Firebase Admin (persistencia de chat) si hay credenciales.
 import './config/firebase'
@@ -32,6 +33,12 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok', service: 'backend-realtime' })
 })
 
+// El cliente WebRTC pide esta config antes de crear el RTCPeerConnection.
+// Mantener las credenciales TURN en el backend evita exponerlas en el bundle del frontend.
+app.get('/ice-servers', (_req, res) => {
+  res.json({ iceServers: getIceServers() })
+})
+
 io.on('connection', (socket) => {
   console.log(`Socket conectado: ${socket.id}`)
 
@@ -45,4 +52,9 @@ io.on('connection', (socket) => {
 
 httpServer.listen(PORT, () => {
   console.log(`backend-realtime corriendo en puerto ${PORT}`)
+  console.log(
+    isTurnConfigured()
+      ? `TURN habilitado (${process.env.TURN_URL || 'relay1.expressturn.com'}): WebRTC podrá atravesar NAT estricto.`
+      : 'TURN deshabilitado: WebRTC usará solo STUN (puede fallar bajo NAT estricto).',
+  )
 })
