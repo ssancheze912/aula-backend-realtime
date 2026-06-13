@@ -1,13 +1,14 @@
+// Carga el .env ANTES que cualquier otro import: los imports se elevan (hoisting)
+// y se ejecutan antes que cualquier sentencia, así que config/firebase.ts (cargado
+// indirectamente vía chatHandlers) leería process.env vacío si dotenv corriera después.
+import 'dotenv/config'
 import express from 'express'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
 import cors from 'cors'
 import helmet from 'helmet'
-import dotenv from 'dotenv'
 import { registerChatHandlers } from './handlers/chatHandlers'
 import { registerRtcHandlers } from './handlers/rtcHandlers'
-
-dotenv.config()
 
 // Inicializa Firebase Admin (persistencia de chat) si hay credenciales.
 import './config/firebase'
