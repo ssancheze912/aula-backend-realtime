@@ -1,23 +1,27 @@
 import { Socket, Server } from 'socket.io'
 
 export function registerRtcHandlers(io: Server, socket: Socket): void {
-  socket.on('rtc:offer', ({ to, offer }) => {
-    io.to(to).emit('rtc:offer', { from: socket.id, offer })
+  // La oferta/respuesta llevan la identidad del emisor: el par que se une no recibe
+  // `rtc:peer_ready` de los que ya estaban (eso solo lo reciben los presentes), así que
+  // aprende quién es cada cual a partir de la oferta que le llega (US-12 / malla P2P).
+  socket.on('rtc:offer', ({ to, offer, userId, username, avatarUrl }) => {
+    io.to(to).emit('rtc:offer', { from: socket.id, offer, userId, username, avatarUrl })
   })
 
-  socket.on('rtc:answer', ({ to, answer }) => {
-    io.to(to).emit('rtc:answer', { from: socket.id, answer })
+  socket.on('rtc:answer', ({ to, answer, userId, username, avatarUrl }) => {
+    io.to(to).emit('rtc:answer', { from: socket.id, answer, userId, username, avatarUrl })
   })
 
   socket.on('rtc:ice', ({ to, candidate }) => {
     io.to(to).emit('rtc:ice', { from: socket.id, candidate })
   })
 
-  socket.on('rtc:ready', ({ roomId, userId, username }) => {
+  socket.on('rtc:ready', ({ roomId, userId, username, avatarUrl }) => {
     socket.to(roomId).emit('rtc:peer_ready', {
       socketId: socket.id,
       userId,
       username,
+      avatarUrl,
     })
   })
 
