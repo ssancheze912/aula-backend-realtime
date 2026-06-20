@@ -21,3 +21,10 @@ services:
         sync: false
       - key: FIREBASE_PRIVATE_KEY
         sync: false
+      # Servidor TURN de ExpressTURN (credenciales del dashboard expressturn.com).
+      - key: TURN_URL
+        value: relay1.expressturn.com
+      - key: TURN_USERNAME
+        sync: false
+      - key: TURN_CREDENTIAL
+        sync: false
