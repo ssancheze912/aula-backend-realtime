@@ -7,19 +7,30 @@ import { saveMessage, getRecentMessages } from '../services/messageService'
 const roomUsers = new Map<string, RoomUser[]>()
 
 /**
- * Contrato de eventos de chat y presencia (TS-02):
+ * Registra los eventos de chat y presencia en un socket conectado.
+ *
+ * Contrato de eventos (TS-02). Ver también README.md § "Eventos WebSocket — Chat y presencia".
  *
  * Cliente → Servidor:
  *   - room:join   { roomId, userId, username, avatarUrl }
+ *                 Une el socket a la sala Socket.IO, actualiza presencia en memoria y
+ *                 emite room:user_joined al resto. Al emisor: room:joined y chat:history.
  *   - room:leave  { roomId, userId }
+ *                 Abandona la sala y emite room:user_left al resto.
  *   - chat:send   { roomId, senderId, senderUsername, senderAvatarUrl, text }
+ *                 Valida roomId y texto; persiste en Firestore (si está habilitado) y emite
+ *                 chat:message a toda la sala. Si falla la persistencia: chat:error al emisor.
  *
  * Servidor → Cliente:
- *   - room:joined       { roomId, users }   (solo al que entra)
- *   - chat:history      { roomId, messages } (solo al que entra)
- *   - room:user_joined  { user }            (al resto de la sala)
- *   - room:user_left    { userId }          (al resto de la sala)
- *   - chat:message      { message }         (a toda la sala)
+ *   - room:joined       { roomId, users }              (solo al que hace room:join)
+ *   - chat:history      { roomId, messages }           (solo al que hace room:join)
+ *   - room:user_joined  { user: { userId, username, avatarUrl } }  (resto de la sala)
+ *   - room:user_left    { userId }                     (resto de la sala)
+ *   - chat:message      { message: ChatMessage }       (toda la sala)
+ *   - chat:error        { error: string }              (solo al emisor en error de guardado)
+ *
+ * Desconexión abrupta: el listener interno de disconnect recorre roomUsers y emite
+ * room:user_left por cada sala donde estaba el socket, sin necesidad de room:leave.
  */
 export function registerChatHandlers(io: Server, socket: Socket): void {
   socket.on('room:join', async ({ roomId, userId, username, avatarUrl }) => {

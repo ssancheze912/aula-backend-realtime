@@ -39,6 +39,7 @@ app.get('/ice-servers', (_req, res) => {
   res.json({ iceServers: getIceServers() })
 })
 
+/** Por cada conexión Socket.IO se registran chat/presencia y señalización WebRTC P2P. */
 io.on('connection', (socket) => {
   console.log(`Socket conectado: ${socket.id}`)
 
