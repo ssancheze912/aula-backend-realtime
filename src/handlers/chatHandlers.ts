@@ -23,6 +23,7 @@ const roomUsers = new Map<string, RoomUser[]>()
  */
 export function registerChatHandlers(io: Server, socket: Socket): void {
   socket.on('room:join', async ({ roomId, userId, username, avatarUrl }) => {
+    if (typeof roomId !== 'string' || !roomId || typeof userId !== 'string' || !userId) return
     socket.join(roomId)
 
     if (!roomUsers.has(roomId)) roomUsers.set(roomId, [])
@@ -47,6 +48,7 @@ export function registerChatHandlers(io: Server, socket: Socket): void {
   })
 
   socket.on('room:leave', ({ roomId, userId }) => {
+    if (typeof roomId !== 'string' || !roomId) return
     socket.leave(roomId)
     const users = roomUsers.get(roomId) ?? []
     const idx = users.findIndex((u) => u.userId === userId)
