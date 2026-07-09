@@ -1,6 +1,6 @@
 # backend-realtime — Socket.io + WebRTC signaling (StudyRoom)
 
-Backend de tiempo real del [Salón de Estudio Colaborativo](../README.md). Gestiona la
+Backend de tiempo real del [Salón de Estudio Colaborativo](https://github.com/ssancheze912/aula-frontend). Gestiona la
 **presencia en salas, el chat en vivo (persistido en Firestore) y la señalización WebRTC**
 para audio/video y compartición de pantalla en malla P2P (full-mesh).
 
@@ -91,6 +91,26 @@ npm run dev      # hot-reload en http://localhost:3002
 npm run build    # compila TypeScript a dist/
 npm start        # ejecuta la versión compilada
 ```
+
+## Despliegue (Render)
+
+Se despliega como *Web Service* en Render desde este repositorio:
+
+| Ajuste | Valor |
+|--------|-------|
+| Build Command | `npm install && npm run build` |
+| Start Command | `npm start` |
+| Health Check Path | `/health` |
+
+Variables de entorno en el dashboard de Render (**Environment**) — las mismas de la tabla
+de arriba. `PORT` la inyecta Render automáticamente; define `NODE_ENV=production`,
+`FRONTEND_URL` con la URL de Vercel (`https://aula-weld.vercel.app`), las `FIREBASE_*`
+(persistencia de chat; con los `\n` escapados) y las `TURN_*` de
+[ExpressTURN](https://www.expressturn.com) (sin ellas WebRTC usa solo STUN).
+
+Tras el deploy, verifica:
+`curl https://aula-backend-realtime.onrender.com/health` →
+`{"status":"ok","service":"backend-realtime"}`.
 
 ## Estructura
 
