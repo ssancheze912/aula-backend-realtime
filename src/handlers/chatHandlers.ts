@@ -20,6 +20,7 @@ const roomUsers = new Map<string, RoomUser[]>()
  *   - room:user_joined  { user }            (al resto de la sala)
  *   - room:user_left    { userId }          (al resto de la sala)
  *   - chat:message      { message }         (a toda la sala)
+ *   - chat:error        { error }           (solo al emisor, si falla al guardar)
  */
 export function registerChatHandlers(io: Server, socket: Socket): void {
   socket.on('room:join', async ({ roomId, userId, username, avatarUrl }) => {

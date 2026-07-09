@@ -33,5 +33,7 @@ if (FIREBASE_PROJECT_ID && FIREBASE_CLIENT_EMAIL && FIREBASE_PRIVATE_KEY) {
   )
 }
 
+/** Cliente de Firestore, o `null` si no hay credenciales (chat sin persistencia). */
 export const adminDb = db
+/** `true` si Firestore está inicializado y el historial de chat se persistirá. */
 export const isFirestoreEnabled = db !== null

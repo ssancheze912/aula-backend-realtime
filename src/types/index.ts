@@ -1,3 +1,4 @@
+/** Usuario presente en una sala. `socketId` es interno y no se emite a los clientes. */
 export interface RoomUser {
   userId: string
   username: string
